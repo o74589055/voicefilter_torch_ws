@@ -19,7 +19,8 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
     embedder.eval()
 
     audio = Audio(hp)
-    model = VoiceFilter(hp).cuda()
+    device = torch.device('cuda')
+    model = nn.DataParallel(VoiceFilter(hp)).to(device)
     if hp.train.optimizer == 'adabound':
         optimizer = AdaBound(model.parameters(),
                              lr=hp.train.adabound.initial,

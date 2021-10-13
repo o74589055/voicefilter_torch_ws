@@ -15,8 +15,8 @@ model:
   fc2_dim: 601 # num_freq
 ---
 data:
-  train_dir: ''
-  test_dir: ''
+  train_dir: '/home/ubuntu/dataset/voicefilter_dataset/voice2/train'
+  test_dir: '/home/ubuntu/dataset/voicefilter_dataset/voice2/test'
   audio_len: 3.0
 ---
 form:

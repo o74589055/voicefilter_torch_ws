@@ -14,7 +14,7 @@ gid=`id -g`
 
 export DOCKER_BUILDKIT=1
 
-DOCKER_IMAGE_NAME=voicefilter-tf
+DOCKER_IMAGE_NAME=voicefilter-torch
 
 # build docker images
 docker build -t ${user}/${DOCKER_IMAGE_NAME} \

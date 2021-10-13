@@ -24,7 +24,7 @@ RUN groupadd --gid ${GID} ${GROUP} \
 RUN sed -i 's@archive.ubuntu.com@ftp.tku.edu.tw/@g' /etc/apt/sources.list
 
 # Install packages
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \  
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
   apt-get install -y --no-install-recommends \
   sudo net-tools htop git rsync wget zip unzip \
   byobu zsh \
