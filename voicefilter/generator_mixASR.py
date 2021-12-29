@@ -23,60 +23,60 @@ def vad_merge(w):
     return np.concatenate(temp, axis=None)
 
 
-def mix(hp, args, audio, num, s1_dvec, s1_target, s2, train):
+def mix(hp, args, num, s1_target, s2, train):
     srate = hp.audio.sample_rate
     dir_ = os.path.join(args.out_dir, 'train' if train else 'test')
 
-    d, _ = librosa.load(s1_dvec, sr=srate)
+    # d, _ = librosa.load(s1_dvec, sr=srate)
     w1, _ = librosa.load(s1_target, sr=srate)
     w2, _ = librosa.load(s2, sr=srate)
-    assert len(d.shape) == len(w1.shape) == len(w2.shape) == 1, \
-        'wav files must be mono, not stereo'
+    # assert   len(w1.shape) == len(w2.shape) == 1, \
+    #     'wav files must be mono, not stereo'
 
-    d, _ = librosa.effects.trim(d, top_db=20)
+    # d, _ = librosa.effects.trim(d, top_db=20)
     w1, _ = librosa.effects.trim(w1, top_db=20)
     w2, _ = librosa.effects.trim(w2, top_db=20)
 
     # if reference for d-vector is too short, discard it
-    if d.shape[0] < 1.1 * hp.embedder.window * hp.audio.hop_length:
-        return
+    # if d.shape[0] < 1.1 * hp.embedder.window * hp.audio.hop_length:
+    #     return
 
-    # LibriSpeech dataset have many silent interval, so let's vad-merge them
-    # VoiceFilter paper didn't do that. To test SDR in same way, don't vad-merge.
+    # # LibriSpeech dataset have many silent interval, so let's vad-merge them
+    # # VoiceFilter paper didn't do that. To test SDR in same way, don't vad-merge.
     if args.vad == 1:
         w1, w2 = vad_merge(w1), vad_merge(w2)
 
-    # I think random segment length will be better, but let's follow the paper first
-    # fit audio to `hp.data.audio_len` seconds.
-    # if merged audio is shorter than `L`, discard it
+    # # I think random segment length will be better, but let's follow the paper first
+    # # fit audio to `hp.data.audio_len` seconds.
+    # # if merged audio is shorter than `L`, discard it
     L = int(srate * hp.data.audio_len)
     if w1.shape[0] < L or w2.shape[0] < L:
         return
     w1, w2 = w1[:L], w2[:L]
 
-    mixed = w1 + w2
+    mixed = w1 + (w2*0.1)
 
     norm = np.max(np.abs(mixed)) * 1.1
     w1, w2, mixed = w1/norm, w2/norm, mixed/norm
 
     # save vad & normalized wav files
-    target_wav_path = formatter(dir_, hp.form.target.wav, num)
+    # target_wav_path = formatter(dir_, hp.form.target.wav, num)
     mixed_wav_path = formatter(dir_, hp.form.mixed.wav, num)
-    librosa.output.write_wav(target_wav_path, w1, srate)
+    # librosa.output.write_wav(target_wav_path, w1, srate)
     librosa.output.write_wav(mixed_wav_path, mixed, srate)
 
     # save magnitude spectrograms
-    target_mag, _ = audio.wav2spec(w1)
-    mixed_mag, _ = audio.wav2spec(mixed)
-    target_mag_path = formatter(dir_, hp.form.target.mag, num)
-    mixed_mag_path = formatter(dir_, hp.form.mixed.mag, num)
-    torch.save(torch.from_numpy(target_mag), target_mag_path)
-    torch.save(torch.from_numpy(mixed_mag), mixed_mag_path)
+    # target_mag, _ = audio.wav2spec(w1)
+    # mixed_mag, _ = audio.wav2spec(mixed)
+    # target_mag_path = formatter(dir_, hp.form.target.mag, num)
+    # mixed_mag_path = formatter(dir_, hp.form.mixed.mag, num)
+    # torch.save(torch.from_numpy(target_mag), target_mag_path)
+    # torch.save(torch.from_numpy(mixed_mag), mixed_mag_path)
 
     # save selected sample as text file. d-vec will be calculated soon
-    dvec_text_path = formatter(dir_, hp.form.dvec, num)
-    with open(dvec_text_path, 'w') as f:
-        f.write(s1_dvec)
+    # dvec_text_path = formatter(dir_, hp.form.dvec, num)
+    # with open(dvec_text_path, 'w') as f:
+    #     f.write(s1_dvec)
 
 
 if __name__ == '__main__':
@@ -137,14 +137,15 @@ if __name__ == '__main__':
     # def train_wrapper(num):
     #     spk1, spk2 = random.sample(train_spk, 2)
     #     s1_dvec, s1_target = random.sample(spk1, 2)
-    #     s2 = random.choice(spk2)
-    #     mix(hp, args, audio, num, s1_dvec, s1_target, s2, train=True)
+        # s2 = random.choice(spk2)
+        # mix(hp, args, audio, num, s1_dvec, s1_target, s2, train=True)
 
     def test_wrapper(num):
-        spk1, spk2 = random.sample(test_spk, 2)
-        s1_dvec, s1_target = random.sample(spk1, 2)
-        s2 = random.choice(spk2)
-        mix(hp, args, audio, num, s1_dvec, s1_target, s2, train=False)
+        s1, s2 =random.sample(test_spk, 2)
+        spk2 = random.choice(s2)
+        for spk1s in  test_spk :
+            for spk1 in spk1s:
+                mix(hp, args, num, spk1, spk2, train=False)
 
     # arr = list(range(10**5))
     # with Pool(cpu_num) as p:

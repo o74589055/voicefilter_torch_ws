@@ -20,7 +20,7 @@ data:
   audio_len: 3.0
 ---
 form:
-  input: '*-norm.wav'
+  input: '*.flac'
   dvec: '*-dvec.txt' # will be calculated on-the-fly
   target:
     wav: '*-target.wav'

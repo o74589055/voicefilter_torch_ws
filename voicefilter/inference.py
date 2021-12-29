@@ -12,7 +12,7 @@ from model.embedder import SpeechEmbedder
 
 def main(args, hp):
     with torch.no_grad():
-        
+
         model = VoiceFilter(hp).cuda()
         chkpt_model = torch.load(args.checkpoint_path)['model']
         model.load_state_dict(chkpt_model, strict=False)
