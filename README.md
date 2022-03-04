@@ -1,7 +1,7 @@
 # voicefilter_torch_ws
 
 
-##環境
+## 環境
 
 1. Python and packages
 
@@ -21,12 +21,43 @@
     ./run-docker-container.bash
     ```
 
-1. 下載 ffmpeg-normalize
-
+1. 另外安裝
+    
+    ffmpeg-normalize
     ```bash
     sudo apt-get install ffmpeg
     ```
-
+    
+    pyyaml
+    ```bash
+    pip install pyyaml==5.4.1
+    ```
+    
+    pyaudio
+    ```bash
+    sudo apt-get install  python3-pyaudio
+    ```
+    
+    webrtcvad 
+    ```bash
+    sudo apt-get install  python3-dev
+    pip install webrtcvad
+    ```
+    
+    若librosa與numba版本不符合
+    
+    更新librosa
+    ```bash
+    sudo pip3 install librosa
+    ```
+    卸載 numba 
+    ```bash
+    sudo pip3 uninstall numba -y
+    ```
+    安裝 numba==0.48 
+    ```bash
+    sudo pip3 install numba==0.48
+    ```
 
 ## 準備資料集
 
@@ -91,7 +122,7 @@
     ```
     This will create `chkpt/name` and `logs/name` at base directory(`-b` option, `.` in default)
 
-2. View tensorboardX
+1. View tensorboardX
 
     ```bash
     tensorboard --logdir ./logs
@@ -99,7 +130,7 @@
     
     ![](./assets/tensorboard.png)
 
-3. 從 checkpoint 開始訓練
+1. 從 checkpoint 開始訓練
 
     ```bash
     python trainer.py -c [config yaml] --checkpoint_path [chkpt/name/chkpt_{step}.pt] -e [path of embedder pt file] -m name
